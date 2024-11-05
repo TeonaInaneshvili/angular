@@ -10,15 +10,15 @@ export class UsersService {
 
 public http = inject(HttpClient);
 
-public userService(): Observable<NewUser> {
-  return this.http.get<NewUser>(
+public getUserService(): Observable<NewUser[]> {
+  return this.http.get<NewUser[]>(
     'http://localhost:3000/users'
   );
 }
 
 public addUserService(request: NewUser): Observable<NewUser> {
   return this.http.post<NewUser>(
-    'http://localhost:3000/newuser',
+    'http://localhost:3000/users',
     request
   );
 }

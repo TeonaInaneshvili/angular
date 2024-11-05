@@ -8,12 +8,12 @@ import { HttpClientModule } from '@angular/common/http';
 @Component({
   selector: 'app-user-form',
   standalone: true,
-  imports: [FormsModule,HttpClientModule],
+  imports: [FormsModule, HttpClientModule],
   templateUrl: './user-form.component.html',
   styleUrl: './user-form.component.scss',
   providers: [UsersService],
 })
-export class UserFormComponent implements OnInit, OnDestroy{
+export class UserFormComponent implements OnDestroy {
   public name = '';
   public surname = '';
   public username = '';
@@ -25,28 +25,29 @@ export class UserFormComponent implements OnInit, OnDestroy{
 
   public hasErrors: boolean = false;
   public destroyed$ = new Subject();
-  
+
   public usersService = inject(UsersService);
 
-
-  ngOnInit() {
-    this.addUser() ;
-  }
-
-  public addUser(): void {
+  public addUser(regForm: any): void {
     this.usersService
-      .addUserService({
-        name: "",
-        surname: "",
-        username: "",
-        email: "",
-        country: "",
-        password: ""
-      })
+      .getUserService()
       .pipe(
         takeUntil(this.destroyed$),
-        tap(() => {
-          this.onSubmit;
+        tap((data) => {
+          if (data.some((el) => el.username === regForm.value.username)) {
+            return;
+          }
+          this.usersService
+            .addUserService({
+              name: regForm.value.name,
+              surname: regForm.value.surname,
+              username: regForm.value.username,
+              email: regForm.value.email,
+              country: regForm.value.country,
+              password: regForm.value.password,
+            })
+            .pipe(takeUntil(this.destroyed$))
+            .subscribe();
         })
       )
       .subscribe();
@@ -56,7 +57,6 @@ export class UserFormComponent implements OnInit, OnDestroy{
     this.destroyed$.next;
     this.destroyed$.complete();
   }
-
 
   public onSubmit(regForm: NgForm): void {
     if (
@@ -74,7 +74,6 @@ export class UserFormComponent implements OnInit, OnDestroy{
     this.invalidPassword = false;
     this.hasError = false;
     console.log(regForm.value);
-    this.addUser();
+    this.addUser(regForm);
   }
-
 }
